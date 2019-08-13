@@ -2,9 +2,9 @@
   "name": "htutil",
   "version": "1.0.0",
   "description": "HT Utilities",
-  "main": "index.js",
+  "main": "htutil.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,14 @@
     "mongodb": "^3.2.7",
     "redis": "^2.8.0",
     "winston": "^3.2.1"
+  },
+  "standard": {
+    "env": {
+      "mocha": true
+    }
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
   }
 }
