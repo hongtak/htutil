@@ -1,22 +1,29 @@
 const { MongoClient } = require('mongodb')
+const logger = require('./logger')
 
 class MongoDb {
-  constructor (config) {
-    this.config = config
-  }
-
-  url () {
+  static url (config) {
     let url = ''
-    if (this.config.username) {
-      url = `${this.config.username}:${this.config.password}@`
+    if (config.username) {
+      url = `${config.username}:${config.password}@`
     }
-    return `mongodb://${url}${this.config.server}/${this.config.db}?authMechanism=${this.config.authMechanism}`
+    return `mongodb://${url}${config.server}/${config.db}?authMechanism=${config.authMechanism}`
   }
 
-  async connect () {
-    this.client = new MongoClient(this.url(), { useNewUrlParser: true })
-    await this.client.connect()
-    this.db = this.client.db(this.config.db)
+  static async connect (config) {
+    MongoDb._client = new MongoClient(MongoDb.url(config), { useNewUrlParser: true })
+    await MongoDb._client.connect()
+    MongoDb._db = MongoDb._client.db(config.db)
+    logger.info(`MongoLib> Connected to MongoDB: ${config.db}`)
+    return MongoDb._db
+  }
+
+  static sharedClient () {
+    return MongoDb._client
+  }
+
+  static sharedDb () {
+    return MongoDb._db
   }
 }
 

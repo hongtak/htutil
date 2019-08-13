@@ -15,41 +15,35 @@ promisifyAll(redis.RedisClient.prototype)
 promisifyAll(redis.Multi.prototype)
 
 class RedisClient {
-  constructor (config) {
-    this.config = config
-  }
-
-  async connect () {
-    const client = redis.createClient(`redis://${this.config.server}`)
-    this.client = client
-
-    return new Promise((resolve, reject) => {
-      // client.on('connect', () => {
-      //   logger.info('RedisLib> Redis connected')
-      // })
-
-      client.on('ready', () => {
-        // logger.info('RedisLib> Redis ready')
-        resolve()
-      })
-
-      client.on('reconnecting', () => {
-        logger.info('RedisLib> Redis reconnecting')
-      })
-
-      client.on('error', (err) => {
-        logger.error('RedisLib> Redis error: ' + err)
-        reject(err)
-      })
-
-      client.on('end', () => {
-        logger.info('RedisLib> Redis disconnected')
-      })
+  static connect (config) {
+    if (RedisClient._client) {
+      RedisClient._client.quit()
+    }
+    RedisClient._client = redis.createClient(`redis://${config.server}`)
+    RedisClient._client.on('connect', () => {
+      logger.info('RedisLib> Redis connected')
     })
+
+    RedisClient._client.on('ready', () => {
+      logger.info('RedisLib> Redis ready')
+    })
+
+    RedisClient._client.on('reconnecting', () => {
+      logger.info('RedisLib> Redis reconnecting')
+    })
+
+    RedisClient._client.on('error', (err) => {
+      logger.error('RedisLib> Redis error: ' + err)
+    })
+
+    RedisClient._client.on('end', () => {
+      logger.info('RedisLib> Redis disconnected')
+    })
+    return RedisClient._client
   }
 
-  quit () {
-    this.client.quit()
+  static sharedClient () {
+    return RedisClient._client
   }
 }
 
