@@ -21,13 +21,14 @@
     "redis": "^2.8.0",
     "winston": "^3.2.1"
   },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "standard": "^13.1.0"
+  },
   "standard": {
     "env": {
       "mocha": true
     }
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^6.2.0"
   }
 }
