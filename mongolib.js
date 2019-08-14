@@ -11,7 +11,7 @@ class MongoDb {
   }
 
   static async connect (config) {
-    MongoDb._client = new MongoClient(MongoDb.url(config), { useNewUrlParser: true })
+    MongoDb._client = new MongoClient(MongoDb.url(config), { useNewUrlParser: true, useUnifiedTopology: true })
     await MongoDb._client.connect()
     MongoDb._db = MongoDb._client.db(config.db)
 
