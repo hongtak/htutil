@@ -25,7 +25,7 @@ class RedisClient {
     })
 
     RedisClient._client.on('ready', () => {
-      logger.info('RedisLib> Redis ready')
+      logger.info(`RedisLib> Redis ready (${RedisClient._client.server_info.redis_version})`)
     })
 
     RedisClient._client.on('reconnecting', () => {

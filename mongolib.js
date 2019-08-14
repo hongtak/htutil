@@ -14,7 +14,9 @@ class MongoDb {
     MongoDb._client = new MongoClient(MongoDb.url(config), { useNewUrlParser: true })
     await MongoDb._client.connect()
     MongoDb._db = MongoDb._client.db(config.db)
-    logger.info(`MongoLib> Connected to MongoDB: ${config.db}`)
+
+    const result = await MongoDb.sharedDb().admin().serverInfo()
+    logger.info(`MongoLib> Connected to MongoDB (${result.version}): ${config.db}`)
     return MongoDb._db
   }
 
