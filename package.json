@@ -17,14 +17,13 @@
   },
   "homepage": "https://github.com/hongtak/htutil#readme",
   "dependencies": {
-    "mongodb": "^3.2.7",
+    "mongodb": "^3.3.3",
     "redis": "^2.8.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.2.0",
-    "standard": "^13.1.0"
+    "mocha": "^6.2.2"
   },
   "standard": {
     "env": {
