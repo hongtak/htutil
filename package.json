@@ -1,6 +1,6 @@
 {
   "name": "htutil",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "HT Utilities",
   "main": "htutil.js",
   "scripts": {
@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/hongtak/htutil#readme",
   "dependencies": {
-    "mongodb": "^3.4.0",
-    "redis": "^2.8.0",
+    "mongodb": "^3.5.3",
+    "redis": "^3.0.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
