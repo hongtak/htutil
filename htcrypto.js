@@ -28,6 +28,10 @@ const setSymmetricKey = (key) => {
   symmetricKey = key
 }
 
+const getSymmetricKey = () => {
+  return symmetricKey
+}
+
 const getPublicKey = () => {
   return ecdh.getPublicKey()
 }
@@ -129,5 +133,6 @@ module.exports = {
   aesCipher,
   aesDecipher,
   debug,
-  setSymmetricKey
+  setSymmetricKey,
+  getSymmetricKey
 }
