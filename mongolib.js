@@ -2,30 +2,44 @@ const { MongoClient } = require('mongodb')
 const logger = require('./logger')
 
 class MongoDb {
-  static url (config) {
-    let url = ''
+  constructor (config) {
+    this._config = config
+    let login = ''
     if (config.username) {
-      url = `${config.username}:${config.password}@`
+      const username = encodeURIComponent(config.username)
+      const password = encodeURIComponent(config.password)
+      login = `${username}:${password}@`
     }
-    return `mongodb://${url}${config.server}/${config.db}?authMechanism=${config.authMechanism}`
+    const url = config.server
+    const db = config.db
+
+    const uri = `mongodb://${login}${url}/${db}`
+    this._client = new MongoClient(uri, { useUnifiedTopology: true })
   }
 
-  static async connect (config) {
-    MongoDb._client = new MongoClient(MongoDb.url(config), { useNewUrlParser: true, useUnifiedTopology: true })
-    await MongoDb._client.connect()
-    MongoDb._db = MongoDb._client.db(config.db)
-
-    const result = await MongoDb.sharedDb().admin().serverInfo()
-    logger.info(`MongoLib> Connected to MongoDB (${result.version}): ${config.db}`)
-    return MongoDb._db
+  async connect () {
+    try {
+      await this._client.connect()
+      this._db = this._client.db(this._config.db)
+      const result = await this._db.admin().serverInfo()
+      logger.info(`MongoLib -> Connected to MongoDB (${result.version})`)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  static sharedClient () {
-    return MongoDb._client
+  async disconnect () {
+    this._client.close()
+    this._client = null
+    this._db = null
   }
 
-  static sharedDb () {
-    return MongoDb._db
+  get client () {
+    return this._client
+  }
+
+  get db () {
+    return this._db
   }
 }
 
