@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb')
 const logger = require('./logger')
 
 class MongoDb {
-  constructor (config) {
+  config (config) {
     this._config = config
     let login = ''
     if (config.username) {
@@ -29,8 +29,9 @@ class MongoDb {
   }
 
   async disconnect () {
-    this._client.close()
-    this._client = null
+    if (this._client) {
+      this._client.close()
+    }
     this._db = null
   }
 
@@ -43,4 +44,4 @@ class MongoDb {
   }
 }
 
-module.exports = MongoDb
+module.exports = new MongoDb()
