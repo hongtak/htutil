@@ -24,7 +24,7 @@ class MongoDb {
       const result = await this._db.admin().serverInfo()
       logger.info(`MongoLib -> Connected to MongoDB (${result.version})`)
     } catch (err) {
-      console.log(err)
+      console.log(`Mongolib error: ${err.message}`)
     }
   }
 
