@@ -20,33 +20,40 @@ class RedisClient {
   }
 
   connect () {
-    if (RedisClient._client) {
-      RedisClient._client.quit()
+    if (this._client) {
+      this._client.quit()
     }
-    RedisClient._client = redis.createClient(`redis://${this._config.server}`)
-    RedisClient._client.on('connect', () => {
+    this._client = redis.createClient(`redis://${this._config.server}`)
+    this._client.on('connect', () => {
       logger.info('RedisLib -> Redis connected')
     })
 
-    RedisClient._client.on('ready', () => {
-      logger.info(`RedisLib -> Redis ready (${RedisClient._client.server_info.redis_version})`)
+    this._client.on('ready', () => {
+      logger.info(`RedisLib -> Redis ready (${this._client.server_info.redis_version})`)
     })
 
-    RedisClient._client.on('reconnecting', () => {
+    this._client.on('reconnecting', () => {
       logger.info('RedisLib -> Redis reconnecting')
     })
 
-    RedisClient._client.on('error', (err) => {
+    this._client.on('error', (err) => {
       logger.error('RedisLib -> Redis error: ' + err)
     })
 
-    RedisClient._client.on('end', () => {
+    this._client.on('end', () => {
       logger.info('RedisLib -> Redis disconnected')
     })
   }
 
   get client () {
-    return RedisClient._client
+    return this._client
+  }
+
+  disconnect () {
+    if (this._client) {
+      this._client.quit()
+    }
+    this._db = null
   }
 }
 
