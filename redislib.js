@@ -37,7 +37,7 @@ class RedisClient {
     })
 
     this._client.on('error', (err) => {
-      logger.error('RedisLib -> Redis error: ' + err)
+      logger.error('RedisLib -> Redis error: ' + err.message)
     })
 
     this._client.on('end', () => {
@@ -52,8 +52,8 @@ class RedisClient {
   disconnect () {
     if (this._client) {
       this._client.quit()
+      this._client = null
     }
-    this._db = null
   }
 }
 
