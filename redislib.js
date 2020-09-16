@@ -23,7 +23,23 @@ class RedisClient {
     if (this._client) {
       this._client.quit()
     }
-    this._client = redis.createClient(`redis://${this._config.server}`)
+    this._client = redis.createClient(`redis://${this._config.server}`, {
+      retry_strategy: (options) => {
+        // if (options.error && options.error.code === 'ECONNREFUSED') {
+        //   return new Error('The server refused the connection')
+        // }
+        // Stop after 60 mins
+        if (options.total_retry_time > 1000 * 60 * 60) {
+          return new Error('Retry time exhasted')
+        }
+        // Stop after 100 attempt
+        // if (options.attempt > 100) {
+        //   return undefined
+        // }
+        logger.info(`RedisLib -> Attempt: ${options.attempt}`)
+        return Math.min(options.attempt * 1000, 30 * 1000)
+      }
+    })
     this._client.on('connect', () => {
       logger.info('RedisLib -> Redis connected')
     })
