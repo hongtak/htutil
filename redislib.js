@@ -1,7 +1,10 @@
 const redis = require('redis')
-// const config = require('../config.json')
-const logger = require('./logger')
+const config = require('../config.json')
+const loggerlib = require('./loggerlib')
 const { promisify } = require('util')
+// const { loggerlib } = require('htutil')
+
+const logger = loggerlib.createLogger(config.logger, 'redis')
 
 function promisifyAll (p) {
   for (const key in p) {
@@ -41,23 +44,23 @@ class RedisClient {
       }
     })
     this._client.on('connect', () => {
-      logger.info('RedisLib -> Redis connected')
+      logger.info('Connected')
     })
 
     this._client.on('ready', () => {
-      logger.info(`RedisLib -> Redis ready (${this._client.server_info.redis_version})`)
+      logger.info(`Ready (${this._client.server_info.redis_version})`)
     })
 
     this._client.on('reconnecting', () => {
-      logger.info('RedisLib -> Redis reconnecting')
+      logger.info('Reconnecting')
     })
 
     this._client.on('error', (err) => {
-      logger.error('RedisLib -> Redis error: ' + err.message)
+      logger.error('Error: ' + err.message)
     })
 
     this._client.on('end', () => {
-      logger.info('RedisLib -> Redis disconnected')
+      logger.info('Disconnected')
     })
   }
 

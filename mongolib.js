@@ -1,5 +1,7 @@
 const { MongoClient } = require('mongodb')
-const logger = require('./logger')
+const config = require('../config.json')
+const loggerlib = require('./loggerlib')
+const logger = loggerlib.createLogger(config.logger, 'mongo')
 
 class MongoDb {
   config (config) {
@@ -22,9 +24,9 @@ class MongoDb {
       await this._client.connect()
       this._db = this._client.db(this._config.db)
       const result = await this._db.admin().serverInfo()
-      logger.info(`MongoLib -> Connected to MongoDB (${result.version})`)
+      logger.info(`Connected to MongoDB (${result.version})`)
     } catch (err) {
-      console.log(`Mongolib error: ${err.message}`)
+      console.log(`Error: ${err.message}`)
     }
   }
 
