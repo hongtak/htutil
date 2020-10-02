@@ -23,15 +23,12 @@ const createLogger = (config, service) => {
     consoleFormat
   )})
 
-  const combinedTransport = new transports.File({ filename: config.combined, format: json() })
-  const errorTransport = new transports.File({ filename: config.error, level: 'warn', format: consoleFormat })
-
   var opt = {
     level: 'info',
     format: combine(
       timestamp()
-    ),
-    transports: [combinedTransport, errorTransport]
+    )
+//    transports: [combinedTransport, errorTransport]
   }
   opt.defaultMeta = { service: service }
   if (config.level) {
@@ -41,6 +38,14 @@ const createLogger = (config, service) => {
   const logger = winston.createLogger(opt)
   if (!config.production) {
     logger.add(consoleTransport)
+  }
+  if (config.combined) {
+    const combinedTransport = new transports.File({ filename: config.combined, format: json() })
+    logger.add(combinedTransport)
+  }
+  if (config.error) {
+    const errorTransport = new transports.File({ filename: config.error, level: 'warn', format: consoleFormat })
+    logger.add(errorTransport)
   }
   return logger
 }

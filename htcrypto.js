@@ -1,5 +1,9 @@
 const crypto = require('crypto')
 const ecdh = crypto.createECDH('secp521r1')
+const config = require('../config.json')
+
+const loggerlib = require('./loggerlib')
+const logger = loggerlib.createLogger(config.logger, 'htcrypto')
 
 const symmetricKeyLength = 32
 const hashType = 'sha256'
@@ -11,6 +15,7 @@ let sharedSecret = Buffer.alloc(0)
 let symmetricKey = Buffer.alloc(0)
 
 const init = () => {
+  logger.info('Initialized')
   generateKeys()
 }
 
@@ -120,7 +125,6 @@ const debug = () => {
 }
 // Initialization
 init()
-console.log('- Module: htcrypto loaded')
 
 module.exports = {
   computeSecret,
