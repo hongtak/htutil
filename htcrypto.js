@@ -121,7 +121,7 @@ const aesDecipher = (encrypted, encoding) => {
 }
 
 const debug = () => {
-  console.log('symmetric key:', symmetricKey.toString('hex'))
+  logger.info('symmetric key:', symmetricKey.toString('hex'))
 }
 // Initialization
 init()

@@ -39,7 +39,7 @@ class RedisClient {
         // if (options.attempt > 100) {
         //   return undefined
         // }
-        logger.info(`RedisLib -> Attempt: ${options.attempt}`)
+        logger.warn(`Attempt: ${options.attempt}`)
         return Math.min(options.attempt * 1000, 30 * 1000)
       }
     })
@@ -52,7 +52,7 @@ class RedisClient {
     })
 
     this._client.on('reconnecting', () => {
-      logger.info('Reconnecting')
+      logger.warn('Reconnecting')
     })
 
     this._client.on('error', (err) => {
@@ -60,7 +60,7 @@ class RedisClient {
     })
 
     this._client.on('end', () => {
-      logger.info('Disconnected')
+      logger.warn('Disconnected')
     })
   }
 
