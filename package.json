@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/hongtak/htutil#readme",
   "dependencies": {
-    "mongodb": "^3.6.1",
+    "mongodb": "^3.6.2",
     "redis": "^3.0.2",
     "winston": "^3.3.3"
   },
