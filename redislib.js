@@ -1,10 +1,5 @@
 const redis = require('redis')
-const config = require('../config.json')
-const loggerlib = require('./loggerlib')
 const { promisify } = require('util')
-// const { loggerlib } = require('htutil')
-
-const logger = loggerlib.createLogger(config.logger, 'redis')
 
 function promisifyAll (p) {
   for (const key in p) {
@@ -18,8 +13,9 @@ promisifyAll(redis.RedisClient.prototype)
 promisifyAll(redis.Multi.prototype)
 
 class RedisClient {
-  config (config) {
+  config (config, callback) {
     this._config = config
+    this.callback = callback
   }
 
   connect () {
@@ -39,28 +35,38 @@ class RedisClient {
         // if (options.attempt > 100) {
         //   return undefined
         // }
-        logger.warn(`Attempt: ${options.attempt}`)
+        this.callback(null, `Attempt: ${options.attempt}`)
         return Math.min(options.attempt * 1000, 30 * 1000)
       }
     })
     this._client.on('connect', () => {
-      logger.info('Connected')
+      if (this.callback) {
+        this.callback('info', 'Redis connected')
+      }
     })
 
     this._client.on('ready', () => {
-      logger.info(`Ready (${this._client.server_info.redis_version})`)
+      if (this.callback) {
+        this.callback('info', `Redis Ready (${this._client.server_info.redis_version})`)
+      }
     })
 
     this._client.on('reconnecting', () => {
-      logger.warn('Reconnecting')
+      if (this.callback) {
+        this.callback('warn', 'Redis reconnecting...')
+      }
     })
 
     this._client.on('error', (err) => {
-      logger.error('Error: ' + err.message)
+      if (this.callback) {
+        this.callback('error', 'Redis error: ' + err.message)
+      }
     })
 
     this._client.on('end', () => {
-      logger.warn('Disconnected')
+      if (this.callback) {
+        this.callback('info', 'Redis disconnected')
+      }
     })
   }
 

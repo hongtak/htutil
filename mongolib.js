@@ -1,11 +1,9 @@
 const { MongoClient } = require('mongodb')
-const config = require('../config.json')
-const loggerlib = require('./loggerlib')
-const logger = loggerlib.createLogger(config.logger, 'mongo')
 
 class MongoDb {
-  config (config) {
+  config (config, callback) {
     this._config = config
+    this.callback = callback
     let login = ''
     if (config.username) {
       const username = encodeURIComponent(config.username)
@@ -24,9 +22,13 @@ class MongoDb {
       await this._client.connect()
       this._db = this._client.db(this._config.db)
       const result = await this._db.admin().serverInfo()
-      logger.info(`Connected to MongoDB (${result.version})`)
+      if (this.callback) {
+        this.callback('info', `Connected to MongoDB (${result.version})`)
+      }
     } catch (err) {
-      logger.error(`Error: ${err.message}`)
+      if (this.callback) {
+        this.callback('error', `MongoDB Error: ${err.message}`)
+      }
     }
   }
 

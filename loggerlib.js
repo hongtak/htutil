@@ -1,6 +1,7 @@
 const winston = require('winston')
 const { format, transports } = winston
-const { combine, timestamp, colorize, printf, json } = format
+const { combine, timestamp, colorize, printf } = format
+const path = require('path')
 
 const consoleFormat = printf(({ level, message, service, timestamp, ...meta }) => {
   if (typeof message === 'object') {
@@ -18,17 +19,18 @@ const consoleFormat = printf(({ level, message, service, timestamp, ...meta }) =
 })
 
 const createLogger = (config, service) => {
-  const consoleTransport = new transports.Console({ format: combine(
-    colorize(),
-    consoleFormat
-  )})
+  const consoleTransport = new transports.Console({
+    format: combine(
+      colorize(),
+      consoleFormat
+    )
+  })
 
   var opt = {
     level: 'info',
     format: combine(
       timestamp()
     )
-//    transports: [combinedTransport, errorTransport]
   }
   opt.defaultMeta = { service: service }
   if (config.level) {
@@ -40,11 +42,13 @@ const createLogger = (config, service) => {
     logger.add(consoleTransport)
   }
   if (config.combined) {
-    const combinedTransport = new transports.File({ filename: config.combined, format: json() })
+    const file = path.join(config.log_path, `${service}-${config.combined}`)
+    const combinedTransport = new transports.File({ filename: file, format: consoleFormat })
     logger.add(combinedTransport)
   }
   if (config.error) {
-    const errorTransport = new transports.File({ filename: config.error, level: 'warn', format: consoleFormat })
+    const file = path.join(config.log_path, `${service}-${config.error}`)
+    const errorTransport = new transports.File({ filename: file, level: 'warn', format: consoleFormat })
     logger.add(errorTransport)
   }
   return logger

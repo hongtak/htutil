@@ -1,9 +1,5 @@
 const crypto = require('crypto')
 const ecdh = crypto.createECDH('secp521r1')
-const config = require('../config.json')
-
-const loggerlib = require('./loggerlib')
-const logger = loggerlib.createLogger(config.logger, 'htcrypto')
 
 const symmetricKeyLength = 32
 const hashType = 'sha256'
@@ -14,10 +10,9 @@ var info = Buffer.alloc(0)
 let sharedSecret = Buffer.alloc(0)
 let symmetricKey = Buffer.alloc(0)
 
-const init = () => {
-  logger.info('Initialized')
-  generateKeys()
-}
+// const init = () => {
+//   generateKeys()
+// }
 
 const configure = (config) => {
   ecdh.setPrivateKey(Buffer.from(config.privateKey.value, config.privateKey.encoding))
@@ -120,11 +115,8 @@ const aesDecipher = (encrypted, encoding) => {
   return decrypted
 }
 
-const debug = () => {
-  logger.info('symmetric key:', symmetricKey.toString('hex'))
-}
-// Initialization
-init()
+// // Initialization
+// init()
 
 module.exports = {
   computeSecret,
@@ -136,7 +128,6 @@ module.exports = {
   configure,
   aesCipher,
   aesDecipher,
-  debug,
   setSymmetricKey,
   getSymmetricKey
 }
