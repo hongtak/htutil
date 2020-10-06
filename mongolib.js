@@ -37,6 +37,7 @@ class MongoDb {
       this._client.close()
     }
     this._db = null
+    this.callback('info', 'MongoDB disconeected')
   }
 
   get client () {
