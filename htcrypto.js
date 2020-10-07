@@ -11,6 +11,7 @@ let sharedSecret = Buffer.alloc(0)
 let symmetricKey = Buffer.alloc(0)
 
 // const init = () => {
+//   console.log('Initial htcrypto')
 //   generateKeys()
 // }
 
@@ -115,7 +116,7 @@ const aesDecipher = (encrypted, encoding) => {
   return decrypted
 }
 
-// // Initialization
+// Initialization
 // init()
 
 module.exports = {
