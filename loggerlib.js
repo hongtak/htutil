@@ -42,14 +42,19 @@ const createLogger = (config, service) => {
     logger.add(consoleTransport)
   }
   if (config.combined) {
-    const file = path.join(config.log_path, `${service}-${config.combined}`)
+    const file = path.join(config.log_path, config.combined)
     const combinedTransport = new transports.File({ filename: file, format: consoleFormat })
     logger.add(combinedTransport)
   }
   if (config.error) {
-    const file = path.join(config.log_path, `${service}-${config.error}`)
+    const file = path.join(config.log_path, config.error)
     const errorTransport = new transports.File({ filename: file, level: 'warn', format: consoleFormat })
     logger.add(errorTransport)
+  }
+  if (config.standalone) {
+    const file = path.join(config.log_path, `${service}.log`)
+    const standaloneTransport = new transports.File({ filename: file, format: consoleFormat })
+    logger.add(standaloneTransport)
   }
   return logger
 }
