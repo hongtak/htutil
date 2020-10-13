@@ -1,18 +1,26 @@
 const crypto = require('crypto')
 
+const randomPool = Buffer.alloc(256)
+let ptr = randomPool.length
+
+function random () {
+  if (ptr > randomPool.length - 16) {
+    crypto.randomFillSync(randomPool)
+    ptr = 0
+  }
+  return randomPool.slice(ptr, (ptr += 16))
+}
+
 function uuidv4 () {
-  const bytes = crypto.randomBytes(16)
+  const bytes = random()
   bytes[6] = (bytes[6] | 0x40) & 0x4F
   bytes[8] = (bytes[8] | 0x80) & 0xBF
-  const id = bytes.toString('hex')
+  return format(bytes)
+}
 
-  const posArray = [8, 4, 4, 4, 12]
-  const output = posArray.reduce((acc, cur) => {
-    acc.array.push(acc.str.substring(0, cur))
-    acc.str = acc.str.substring(cur)
-    return acc
-  }, { str: id, array: [] })
-  return output.array.join('-')
+function format (buffer) {
+  const str = buffer.toString('hex')
+  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20, 32)}`
 }
 
 module.exports = {
