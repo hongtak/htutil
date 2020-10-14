@@ -18,7 +18,7 @@ class RedisClient {
     this.callback = callback
   }
 
-  connect () {
+  async connect () {
     if (this._client) {
       this._client.quit()
     }
@@ -39,16 +39,20 @@ class RedisClient {
         return Math.min(options.attempt * 1000, 30 * 1000)
       }
     })
-    this._client.on('connect', () => {
-      if (this.callback) {
-        this.callback('info', 'Redis connected')
-      }
-    })
 
-    this._client.on('ready', () => {
-      if (this.callback) {
-        this.callback('info', `Redis Ready (${this._client.server_info.redis_version})`)
-      }
+    const p = new Promise((resolve, reject) => {
+      this._client.on('connect', () => {
+        if (this.callback) {
+          this.callback('info', 'Redis connected')
+        }
+      })
+
+      this._client.on('ready', () => {
+        if (this.callback) {
+          this.callback('info', `Redis Ready (${this._client.server_info.redis_version})`)
+          resolve()
+        }
+      })
     })
 
     this._client.on('reconnecting', () => {
@@ -68,6 +72,8 @@ class RedisClient {
         this.callback('info', 'Redis disconnected')
       }
     })
+
+    return p
   }
 
   get client () {
