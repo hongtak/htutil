@@ -35,19 +35,21 @@ class RedisClient {
         // if (options.attempt > 100) {
         //   return undefined
         // }
-        this.callback(null, `Attempt: ${options.attempt}`)
+        this.callback('info', `Attempt: ${options.attempt}`)
         return Math.min(options.attempt * 1000, 30 * 1000)
       }
     })
 
+    this._client.auth(this._config.password)
+
     const p = new Promise((resolve, reject) => {
-      this._client.on('connect', () => {
+      this._client.on('connect', async () => {
         if (this.callback) {
           this.callback('info', 'Redis connected')
         }
       })
 
-      this._client.on('ready', () => {
+      this._client.on('ready', async () => {
         if (this.callback) {
           this.callback('info', `Redis Ready (${this._client.server_info.redis_version})`)
           resolve()
