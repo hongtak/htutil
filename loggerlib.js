@@ -26,7 +26,7 @@ const createLogger = (config, service) => {
     )
   })
 
-  var opt = {
+  const opt = {
     level: 'info',
     format: combine(
       timestamp()

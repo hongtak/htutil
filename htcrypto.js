@@ -4,8 +4,8 @@ const ecdh = crypto.createECDH('secp521r1')
 const symmetricKeyLength = 32
 const hashType = 'sha256'
 const hashLength = 32
-var salt = Buffer.alloc(0)
-var info = Buffer.alloc(0)
+let salt = Buffer.alloc(0)
+let info = Buffer.alloc(0)
 
 let sharedSecret = Buffer.alloc(0)
 let symmetricKey = Buffer.alloc(0)
@@ -42,10 +42,10 @@ const generateKeys = () => {
 }
 
 const deriveHKDFKey = () => {
-  var t = Buffer.alloc(0)
-  var okm = Buffer.alloc(0)
+  let t = Buffer.alloc(0)
+  let okm = Buffer.alloc(0)
   const prk = hmacHash(salt, sharedSecret)
-  for (var i = 0; i < symmetricKeyLength / hashLength; i++) {
+  for (let i = 0; i < symmetricKeyLength / hashLength; i++) {
     const x = Buffer.concat([t, info, Buffer.from([i + 1])])
     t = hmacHash(prk, x)
     okm = Buffer.concat([okm, t])
