@@ -1,5 +1,6 @@
-const redis = require('redis')
-const { promisify } = require('util')
+import redis from 'redis'
+import util from 'util'
+const { promisify } = util
 
 function promisifyAll (p) {
   for (const key in p) {
@@ -90,4 +91,5 @@ class RedisClient {
   }
 }
 
-module.exports = new RedisClient()
+const redisClient = new RedisClient()
+export { redisClient }

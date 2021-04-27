@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+import crypto from 'crypto'
 
 const randomPool = Buffer.alloc(256)
 let ptr = randomPool.length
@@ -23,6 +23,4 @@ function format (buffer) {
   return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20, 32)}`
 }
 
-module.exports = {
-  uuidv4
-}
+export { uuidv4 }

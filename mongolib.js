@@ -1,54 +1,31 @@
-const { MongoClient } = require('mongodb')
+import pkg from 'mongodb'
 
-class MongoDb {
-  config (config, callback) {
-    this._config = config
-    this.callback = callback
-    let login = ''
-    if (config.username) {
-      const username = encodeURIComponent(config.username)
-      const password = encodeURIComponent(config.password)
-      login = `${username}:${password}@`
-    }
-    const url = config.server
-    const db = config.db
+const { MongoClient } = pkg
 
-    const uri = `mongodb://${login}${url}/${db}`
-    this._client = new MongoClient(uri, { useUnifiedTopology: true })
+class MongoLib {
+  config (config) {
+    this.config = config
+    const uri = `mongodb://${config.username}:${config.password}@${config.server}/${config.db}`
+    this.client = new MongoClient(uri, { useUnifiedTopology: true })
+  }
+
+  onChange (callback) {
+    const eventName = 'serverDescriptionChanged'
+    this.client.on(eventName, callback)
   }
 
   async connect () {
-    try {
-      await this._client.connect()
-      this._db = this._client.db(this._config.db)
-      const result = await this._db.admin().serverInfo()
-      if (this.callback) {
-        this.callback('info', `Connected to MongoDB (${result.version})`)
-      }
-    } catch (err) {
-      if (this.callback) {
-        this.callback('error', `MongoDB Error: ${err.message}`)
-      }
-    }
+    await this.client.connect()
+    this.db = this.client.db(this.config.db)
+    return this.db.admin().serverInfo()
   }
 
   async disconnect () {
-    if (this._client) {
-      this._client.close()
+    if (this.client) {
+      this.client.close()
     }
-    this._db = null
-    if (this.callback) {
-      this.callback('info', 'MongoDB disconeected')
-    }
-  }
-
-  get client () {
-    return this._client
-  }
-
-  get db () {
-    return this._db
+    this.db = null
   }
 }
 
-module.exports = new MongoDb()
+export const mongo = new MongoLib()

@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+import crypto from 'crypto'
 const ecdh = crypto.createECDH('secp521r1')
 
 const symmetricKeyLength = 32
@@ -101,7 +101,7 @@ const aesCipher = (plaintext, encoding) => {
   return Buffer.concat([nonce, encrypted, tag])
 }
 
-const aesDecipher = (encrypted, encoding) => {
+export const aesDecipher = (encrypted, encoding) => {
   // aes-256-gcm
   encrypted = Buffer.from(encrypted, encoding)
 
@@ -119,7 +119,7 @@ const aesDecipher = (encrypted, encoding) => {
 // Initialization
 // init()
 
-module.exports = {
+export {
   computeSecret,
   deriveHKDFKey,
   getPublicKey,
@@ -128,7 +128,6 @@ module.exports = {
   chachaDecipher,
   configure,
   aesCipher,
-  aesDecipher,
   setSymmetricKey,
   getSymmetricKey
 }
