@@ -2,7 +2,7 @@
 // import uuidv4 from './uuid.js'
 export { createLogger } from './logger.js'
 export { mongo } from './mongolib.js'
-export { redisClient } from './redislib.js'
+export { redisManager } from './redislib.js'
 export * as htcrypto from './htcrypto.js'
 export * from './uuid.js'
 // const MongoDb = require('./mongolib')

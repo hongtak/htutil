@@ -15,7 +15,7 @@ class MongoLib {
   }
 
   async connect () {
-    await this.client.connect()
+    this.client = await this.client.connect()
     this.db = this.client.db(this.config.db)
     return this.db.admin().serverInfo()
   }
