@@ -1,6 +1,18 @@
 import redis from 'redis'
 import { promisify } from 'util'
 
+function myP (p, key) {
+  if (p[key] instanceof Function) {
+    p[`${key}Async`] = promisify(p[key])
+  }
+}
+
+const commands = ['srandmember', 'incr', 'hmset', 'srem', 'smembers', 'hgetall', 'hget', 'hset', 'sadd',
+  'del', 'keys', 'set', 'sismember', 'hincrby', 'hmget', 'hdel', 'brpop', 'get', 'ttl', 'lpush']
+commands.forEach(cmd => {
+  myP(redis.RedisClient.prototype, cmd)
+})
+
 class RedisLib {
   config (config, callback) {
     this.callback = callback
@@ -65,15 +77,5 @@ function promisifyAll (p) {
   }
 }
 
-function myP (p, key) {
-  if (p[key] instanceof Function) {
-    p[`${key}Async`] = promisify(p[key])
-  }
-}
-
-const commands = ['srandmember', 'incr', 'hmset', 'srem']
-commands.forEach(cmd => {
-  myP(redis.RedisClient.prototype, cmd)
-})
 
 export const redisManager = new RedisLib()
