@@ -33,7 +33,7 @@ class RedisLib {
       this.connected = true
     })
 
-    this.client.on('reconnecting', (obj) => { 
+    this.client.on('reconnecting', (obj) => {
       if (this.callback) {
         this.callback('warn', `Redis --> reconnecting: ${obj.delay} ${obj.total_retry_time} ${obj.attempt} ${obj.times_connected}`)
       }
@@ -68,14 +68,5 @@ class RedisLib {
     })
   }
 }
-
-function promisifyAll (p) {
-  for (const key in p) {
-    if (p[key] instanceof Function) {
-      p[`${key}Async`] = promisify(p[key])
-    }
-  }
-}
-
 
 export const redisManager = new RedisLib()
