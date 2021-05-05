@@ -1,19 +1,29 @@
 import redis from 'redis'
 import { promisify } from 'util'
 
-function myP (p, key) {
-  if (p[key] instanceof Function) {
-    p[`${key}Async`] = promisify(p[key])
-  }
-}
-
 const commands = ['srandmember', 'incr', 'hmset', 'srem', 'smembers', 'hgetall', 'hget', 'hset', 'sadd',
-  'del', 'keys', 'set', 'sismember', 'hincrby', 'hmget', 'hdel', 'brpop', 'get', 'ttl', 'lpush']
-commands.forEach(cmd => {
-  myP(redis.RedisClient.prototype, cmd)
-})
+  'del', 'keys', 'set', 'sismember', 'hincrby', 'hmget', 'hdel', 'brpop', 'get', 'ttl', 'lpush', 'type', 'scard']
 
 class RedisLib {
+  promisify (key) {
+    const p = redis.RedisClient.prototype
+    if (p[key] instanceof Function) {
+      p[`${key}Async`] = promisify(p[key])
+    } else {
+      console.log(`RedisLib warning: ${key} not a valid function`)
+    }
+  }
+
+  promisifyAll (keys) {
+    keys.forEach(cmd => {
+      this.promisify(cmd)
+    })
+  }
+
+  constructor () {
+    this.promisifyAll(commands)
+  }
+
   config (config, callback) {
     this.callback = callback
     config.retry_strategy = (options) => {
