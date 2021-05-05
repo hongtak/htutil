@@ -30,8 +30,9 @@ class RedisLib {
       if (options.total_retry_time > 1000 * 60 * 60) {
         return new Error('Retry time exhasted')
       }
-      // console.log(`attempt: ${options.attempt}`)
-      return Math.min(options.attempt * 1000, 30 * 1000)
+
+      // return options.total_retry_time < 600000 ? 5000 : 10000
+      return Math.min((options.attempt + 5) * 1000, 30 * 1000)
     }
     this.config = config
     this.client = redis.createClient(config)
@@ -45,7 +46,7 @@ class RedisLib {
 
     this.client.on('reconnecting', (obj) => {
       if (this.callback) {
-        this.callback('warn', `Redis --> reconnecting: ${obj.delay} ${obj.total_retry_time} ${obj.attempt} ${obj.times_connected}`)
+        this.callback('warn', `Redis --> reconnecting attempt: #${obj.attempt}, total: ${obj.total_retry_time / 1000}s wait: ${obj.delay / 1000}s [${obj.times_connected}]`)
       }
       // console.log(`--> reconnected: ${obj.delay} ${obj.total_retry_time} ${obj.attempt} ${obj.times_connected}`)
       this.connected = false
