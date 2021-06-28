@@ -44,12 +44,23 @@ class RedisLib {
       this.connected = true
     })
 
+    this.client.on('connect', () => {
+      if (this.callback) {
+        this.callback('info', 'Redis --> connect')
+      }
+    })
+
     this.client.on('reconnecting', (obj) => {
       if (this.callback) {
         this.callback('warn', `Redis --> reconnecting attempt: #${obj.attempt}, total: ${obj.total_retry_time / 1000}s wait: ${obj.delay / 1000}s [${obj.times_connected}]`)
       }
       // console.log(`--> reconnected: ${obj.delay} ${obj.total_retry_time} ${obj.attempt} ${obj.times_connected}`)
-      this.connected = false
+    })
+
+    this.client.on('error', (err) => {
+      if (this.callback) {
+        this.callback('error', `Redis --> error: ${err}`)
+      }
     })
 
     this.client.on('end', () => {
@@ -57,19 +68,6 @@ class RedisLib {
         this.callback('info', 'Redis --> end')
       }
       this.connected = false
-    })
-
-    this.client.on('error', (err) => {
-      if (this.callback) {
-        this.callback('error', `Redis --> error: ${err}`)
-      }
-      this.connected = false
-    })
-
-    this.client.on('connect', () => {
-      if (this.callback) {
-        this.callback('info', 'Redis --> connect')
-      }
     })
 
     this.client.on('warning', () => {
