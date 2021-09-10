@@ -1,8 +1,9 @@
 import { mongo, redisManager } from './htutil.js'
+import { setInterval } from 'timers/promises'
 
 const config = {
   redis: {
-    host: '10.0.10.152',
+    host: '10.0.20.151',
     password: 'hungryrabbit112'
   },
   mongodb: {
@@ -28,3 +29,21 @@ redisManager.config(config.redis, (level, msg) => {
   console.log({ level: level, message: `[#${process.pid}] ${msg}` })
 })
 
+mainLoop().catch((err) => {
+  console.log(`mainLoop dead -> ${err}`)
+})
+
+async function mainLoop () {
+  for await (const a of setInterval(1000, 'hello')) {
+    if (redisManager.client.connected) {
+      const count = await redisManager.client.incrAsync('hellocount')
+      console.log(`name: ${a}: ${count}`)
+    } else {
+      console.log('redis disconnected')
+    }
+  }
+}
+
+// redisManager.client.quit(() => {
+//   console.log('redis.quit()')
+// })

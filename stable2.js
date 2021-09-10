@@ -39,8 +39,8 @@ const config = {
 // })
 
 function randomCrash (next) {
-  const t = randomInt(100, 200)
-  if (t > 180) {
+  const t = randomInt(30, 200)
+  if (t > 190) {
     next(Error('Timeout'))
   } else {
     setTimeout(() => {
@@ -51,8 +51,8 @@ function randomCrash (next) {
 
 function randomCrash2 () {
   const promise = new Promise((resolve, reject) => {
-    const t = randomInt(100, 200)
-    if (t > 195) {
+    const t = randomInt(30, 200)
+    if (t > 190) {
       reject(Error('Timeout'))
     } else {
       setTimeout(() => {

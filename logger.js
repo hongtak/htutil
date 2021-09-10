@@ -14,7 +14,7 @@ const consoleFormat = printf(({ level, message, service, timestamp, ...meta }) =
 })
 
 const createLogger = (config, service) => {
-  const serviceConfig = config[service]
+  const serviceConfig = config
   const opt = {
     format: combine(
       timestamp()
