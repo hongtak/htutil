@@ -4,6 +4,12 @@ export { createLogger } from './logger.js'
 export { mongo } from './mongolib.js'
 export { redisManager } from './redislib.js'
 export * as htcrypto from './htcrypto.js'
+
+// V2 library
+export * as loggerlib from './v2/loggerlib.js'
+export * as mongolib from './v2/mongolib.js'
+export * as redislib from './v2/redislib.js'
+
 // const MongoDb = require('./mongolib')
 // const uuid = require('./uuid')
 // const RedisClient = require('./redislib')
