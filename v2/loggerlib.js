@@ -40,6 +40,7 @@ function create (options, service) {
     logger.add(httpTransport)
   }
   data.logger = logger
+  return logger
 }
 
 function logger () {

@@ -3,9 +3,9 @@ import redis from 'redis'
 const connection = {}
 
 async function create (opt) {
-  opt.redis.socket.reconnectStrategy = (retries) => {
-    return Math.min(retries * 1000, 30000)
-  }
+  // opt.redis.socket.reconnectStrategy = (retries) => {
+  //   return Math.min(retries * 1000, 30000)
+  // }
 
   const client = redis.createClient(opt.redis)
   instanceEventListeners(client, opt.logger)

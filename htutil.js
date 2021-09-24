@@ -1,14 +1,14 @@
-// import htcrypto from './htcrypto.js'
-// import uuidv4 from './uuid.js'
+import loggerlib from './v2/loggerlib.js'
+import mongolib from './v2/mongolib.js'
+import redislib from './v2/redislib.js'
+
 export { createLogger } from './logger.js'
 export { mongo } from './mongolib.js'
-export { redisManager } from './redislib.js'
+// export { redisManager } from './redislib.js'
 export * as htcrypto from './htcrypto.js'
 
 // V2 library
-export * as loggerlib from './v2/loggerlib.js'
-export * as mongolib from './v2/mongolib.js'
-export * as redislib from './v2/redislib.js'
+export { loggerlib, mongolib, redislib }
 
 // const MongoDb = require('./mongolib')
 // const uuid = require('./uuid')
