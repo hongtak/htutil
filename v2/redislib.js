@@ -13,7 +13,7 @@ async function create (opt, logger) {
   connection.client = client
   const info = await serverInfo()
   if (logger) {
-    logger({ level: 'info', message: `[redis]: Connected, server version ${info.redis_version}` })
+    logger({ level: 'info', message: `[redis]: Connected to: ${opt.socket.host}, server version ${info.redis_version}` })
   }
   return client
 }

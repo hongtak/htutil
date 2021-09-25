@@ -10,7 +10,7 @@ async function create (config, logger) {
   connection.db = client.db(config.db)
   connection.logger = logger
   const version = await serverVersion()
-  logger({ level: 'info', message: `[mongodb]: server version ${version}` })
+  logger({ level: 'info', message: `[mongodb]: Connected to: ${config.server}, server version ${version}` })
   return client
 }
 
