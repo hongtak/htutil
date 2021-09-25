@@ -1,6 +1,6 @@
 {
   "name": "htutil",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "HT Utilities",
   "main": "htutil.js",
   "scripts": {

@@ -2,16 +2,15 @@ import { MongoClient } from 'mongodb'
 
 const connection = {}
 
-async function create (opt) {
-  const config = opt.mongodb
-  const logger = opt.logger
+async function create (config, logger) {
   const uri = `mongodb://${config.username}:${config.password}@${config.server}/${config.db}`
   const client = new MongoClient(uri)
   eventListeners(client, logger)
   connection.client = await client.connect()
   connection.db = client.db(config.db)
+  connection.logger = logger
   const version = await serverVersion()
-  logger({ level: 'info', message: `[mongo]: server version ${version}` })
+  logger({ level: 'info', message: `[mongodb]: server version ${version}` })
   return client
 }
 
@@ -30,6 +29,9 @@ function db () {
 
 async function close () {
   await connection.client.close()
+  if (connection.logger) {
+    connection.logger({ level: 'warn', message: '[mongodb]: Connection closed.' })
+  }
   connection.client = null
   connection.db = null
 }
@@ -39,7 +41,7 @@ function eventListeners (client, logger) {
   client.on(eventName, event => {
     const previousType = event.previousDescription.type
     const newType = event.newDescription.type
-    logger({ level: 'info', message: `[mongo]: ${previousType} => ${newType}` })
+    logger({ level: 'info', message: `[mongodb]: Server description changed from ${previousType} => ${newType}` })
     connection.type = newType
   })
 }

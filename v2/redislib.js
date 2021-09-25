@@ -1,19 +1,19 @@
-import redis from 'redis'
+import { createClient } from 'redis'
 
 const connection = {}
 
-async function create (opt) {
-  // opt.redis.socket.reconnectStrategy = (retries) => {
-  //   return Math.min(retries * 1000, 30000)
-  // }
+async function create (opt, logger) {
+  opt.socket.reconnectStrategy = (retries) => {
+    return Math.min(retries * 1000, 30000)
+  }
 
-  const client = redis.createClient(opt.redis)
-  instanceEventListeners(client, opt.logger)
+  const client = createClient(opt)
+  instanceEventListeners(client, logger)
   await client.connect()
   connection.client = client
   const info = await serverInfo()
-  if (opt.logger) {
-    opt.logger({ level: 'info', message: `[redis]: server version ${info.redis_version}` })
+  if (logger) {
+    logger({ level: 'info', message: `[redis]: Connected, server version ${info.redis_version}` })
   }
   return client
 }
@@ -31,47 +31,48 @@ async function serverInfo () {
   return serverInfo
 }
 
+async function serverVersion () {
+  const info = await serverInfo()
+  return info.redis_version
+}
+
 function client () {
   return connection.client
 }
 
 async function close () {
-  await connection.client.quit()
-  connection.client = null
+  if (connection.client) {
+    await connection.client.quit()
+    connection.client = null
+  }
 }
 
 function instanceEventListeners (client, logger) {
   if (!logger) { return }
-  client.on('error', (err) => {
-    const msg = { level: 'error', message: `[redis]: ${err.message}` }
-    if (logger) { logger(msg) }
-  })
   client.on('connect', () => {
-    const msg = { level: 'info', message: '[redis]: connect' }
-    if (logger) { logger(msg) }
+    logger({ level: 'info', message: '[redis]: connect' })
   })
   client.on('ready', () => {
-    const msg = { level: 'info', message: '[redis]: ready' }
-    if (logger) { logger(msg) }
+    logger({ level: 'info', message: '[redis]: ready' })
+  })
+  client.on('error', (err) => {
+    logger({ level: 'error', message: `[redis] ${err.message}` })
   })
   client.on('reconnecting', () => {
-    const msg = { level: 'info', message: '[redis]: reconnecting' }
-    if (logger) { logger(msg) }
+    logger({ level: 'warn', message: '[redis]: reconnecting' })
   })
   client.on('end', () => {
-    const msg = { level: 'info', message: '[redis]: end' }
-    if (logger) { logger(msg) }
+    logger({ level: 'warn', message: '[redis]: end' })
     connection.client = null
   })
   client.on('warning', () => {
-    const msg = { level: 'warn', message: '[redis]: warning' }
-    if (logger) { logger(msg) }
+    logger({ level: 'warn', message: '[redis]: warning' })
   })
 }
 
 export default {
   create,
-  serverInfo,
+  serverVersion,
   client,
   close
 }
