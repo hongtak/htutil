@@ -8,9 +8,9 @@ const data = {}
 const myFormat = printf(({ level, message, timestamp, service, ...meta }) => {
   let output = `${timestamp} `
   if (service) { output += `[${service}] ` }
-  if (typeof message === 'object') { message = JSON.stringify(message, null) }
+  if (typeof message === 'object') { message = JSON.stringify(message, null, 2) }
   output += `${level} - ${message}`
-  if (Object.keys(meta).length > 0) { output += ` => ${JSON.stringify(meta)}` }
+  if (Object.keys(meta).length > 0) { output += ` => ${JSON.stringify(meta, null, 2)}` }
   return output
 })
 

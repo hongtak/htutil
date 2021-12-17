@@ -9,6 +9,7 @@ async function create (opt, logger) {
 
   const client = createClient(opt)
   instanceEventListeners(client, logger)
+
   await client.connect()
   connection.client = client
   const info = await serverInfo()
@@ -49,7 +50,7 @@ async function close () {
 
 function instanceEventListeners (client, logger) {
   if (!logger) { return }
-  client.on('connect', () => {
+  client.on('connect', async () => {
     logger({ level: 'info', message: '[redis]: connect' })
   })
   client.on('ready', () => {
@@ -65,14 +66,12 @@ function instanceEventListeners (client, logger) {
     logger({ level: 'warn', message: '[redis]: end' })
     connection.client = null
   })
-  client.on('warning', () => {
-    logger({ level: 'warn', message: '[redis]: warning' })
-  })
 }
 
 export default {
   create,
   serverVersion,
+  serverInfo,
   client,
   close
 }

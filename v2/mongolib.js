@@ -19,6 +19,10 @@ async function serverVersion () {
   return info.version
 }
 
+async function serverInfo () {
+  return connection.db.admin().serverInfo()
+}
+
 function client () {
   return connection.client
 }
@@ -49,6 +53,7 @@ function eventListeners (client, logger) {
 export default {
   create,
   serverVersion,
+  serverInfo,
   client,
   db,
   close
