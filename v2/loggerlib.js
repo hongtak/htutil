@@ -14,7 +14,11 @@ const myFormat = printf(({ level, message, timestamp, service, ...meta }) => {
   return output
 })
 
-function create (options, service) {
+function create (config, service) {
+  const options = config.logger
+  if (!options) {
+    throw new Error('Missing logger info in config file')
+  }
   const logger = createLogger({
     defaultMeta: { service: service }
   })

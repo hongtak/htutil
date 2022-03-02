@@ -1,26 +1,26 @@
 import { MongoClient } from 'mongodb'
 
-const connection = {}
+const connection = {
+  logger: console.log
+}
 
 async function create (config, logger) {
-  const uri = `mongodb://${config.username}:${config.password}@${config.server}/${config.db}`
-  const client = new MongoClient(uri)
-  eventListeners(client, logger)
-  connection.client = await client.connect()
-  connection.db = client.db(config.db)
-  connection.logger = logger
-  const version = await serverVersion()
-  logger({ level: 'info', message: `[mongodb]: Connected to: ${config.server}, server version ${version}` })
+  const mongoConfig = config.mongodb
+  if (!mongoConfig) {
+    throw new Error('Missing mongodb in config file.')
+  }
+  connection.logger = logger ?? (log => console.log(`${log.level} - ${log.message}`))
+  const uri = `mongodb://${mongoConfig.username}:${mongoConfig.password}@${mongoConfig.server}/${mongoConfig.db}`
+  connection.client = new MongoClient(uri)
+  eventListeners()
+  await connection.client.connect()
+  const info = await serverInfo()
+  connection.logger({ level: 'info', message: `[mongodb]: Connected to: ${mongoConfig.server}, server version ${info.version}` })
   return client
 }
 
-async function serverVersion () {
-  const info = await connection.db.admin().serverInfo()
-  return info.version
-}
-
 async function serverInfo () {
-  return connection.db.admin().serverInfo()
+  return connection.client.db().admin().serverInfo()
 }
 
 function client () {
@@ -28,31 +28,28 @@ function client () {
 }
 
 function db () {
-  return connection.db
+  return connection.client.db()
 }
 
 async function close () {
   await connection.client.close()
-  if (connection.logger) {
-    connection.logger({ level: 'warn', message: '[mongodb]: Connection closed.' })
-  }
   connection.client = null
-  connection.db = null
+  connection.logger({ level: 'warn', message: '[mongodb]: Connection closed.' })
 }
 
-function eventListeners (client, logger) {
+function eventListeners () {
   const eventName = 'serverDescriptionChanged'
-  client.on(eventName, event => {
+  connection.client.on(eventName, event => {
     const previousType = event.previousDescription.type
     const newType = event.newDescription.type
-    logger({ level: 'info', message: `[mongodb]: Server description changed from ${previousType} => ${newType}` })
+    connection.logger({ level: 'info', message: `[mongodb]: Server description changed from ${previousType} => ${newType}` })
     connection.type = newType
   })
 }
 
 export default {
   create,
-  serverVersion,
+  // serverVersion,
   serverInfo,
   client,
   db,

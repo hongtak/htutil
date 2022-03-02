@@ -2,39 +2,39 @@ import { createClient } from 'redis'
 
 const connection = {}
 
-async function create (opt, logger) {
+async function create (config, logger) {
+  const opt = config.redis
+  if (!opt) {
+    throw new Error('Missing redis in config file.')
+  }
+  connection.logger = logger ?? (log => console.log(`${log.level} - ${log.message}`))
   opt.socket.reconnectStrategy = (retries) => {
     return Math.min(retries * 1000, 30000)
   }
+  connection.client = createClient(opt)
+  instanceEventListeners()
 
-  const client = createClient(opt)
-  instanceEventListeners(client, logger)
-
-  await client.connect()
-  connection.client = client
+  await connection.client.connect()
   const info = await serverInfo()
-  if (logger) {
-    logger({ level: 'info', message: `[redis]: Connected to: ${opt.socket.host}, server version ${info.redis_version}` })
-  }
+  connection.logger({ level: 'info', message: `[redis]: Connected to: ${opt.socket.host}, server version ${info.redis_version}` })
   return client
 }
 
 async function serverInfo () {
   const info = await connection.client.info('server')
-  const array = info.split('\r\n')
-  const serverInfo = {}
+  return dataSplit(info)
+}
+
+function dataSplit (data) {
+  const array = data.split('\r\n')
+  const info = {}
   for (const a of array) {
     const row = a.split(':')
     if (row.length === 2) {
-      serverInfo[row[0]] = row[1].trim()
+      info[row[0]] = row[1].trim()
     }
   }
-  return serverInfo
-}
-
-async function serverVersion () {
-  const info = await serverInfo()
-  return info.redis_version
+  return info
 }
 
 function client () {
@@ -48,29 +48,21 @@ async function close () {
   }
 }
 
-function instanceEventListeners (client, logger) {
-  if (!logger) { return }
-  client.on('connect', async () => {
-    logger({ level: 'info', message: '[redis]: connect' })
-  })
-  client.on('ready', () => {
-    logger({ level: 'info', message: '[redis]: ready' })
-  })
-  client.on('error', (err) => {
-    logger({ level: 'error', message: `[redis] ${err.message}` })
-  })
-  client.on('reconnecting', () => {
-    logger({ level: 'warn', message: '[redis]: reconnecting' })
-  })
+function instanceEventListeners () {
+  const logger = connection.logger
+  const client = connection.client
+  client.on('connect', () => logger({ level: 'info', message: '[redis]: Initiating...' }))
+  client.on('ready', () => logger({ level: 'info', message: '[redis]: Connection initiated.' }))
+  client.on('error', (err) => logger({ level: 'error', message: `[redis] ${err.message}` }))
+  client.on('reconnecting', () => logger({ level: 'warn', message: '[redis]: Reconnecting...' }))
   client.on('end', () => {
-    logger({ level: 'warn', message: '[redis]: end' })
+    logger({ level: 'warn', message: '[redis]: Connection closed.' })
     connection.client = null
   })
 }
 
 export default {
   create,
-  serverVersion,
   serverInfo,
   client,
   close
