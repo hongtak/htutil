@@ -17,7 +17,7 @@ async function create (config, logger) {
   await connection.client.connect()
   const info = await serverInfo()
   connection.logger({ level: 'info', message: `[redis]: Connected to: ${opt.socket.host}, server version ${info.redis_version}` })
-  return client
+  return connection.client
 }
 
 async function serverInfo () {
