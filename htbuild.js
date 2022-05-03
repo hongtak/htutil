@@ -7,28 +7,35 @@ main()
 
 async function main () {
   const { stdout, stderr } = await execP('git status --porcelain')
-
   if (stderr) {
     console.log(stderr)
   }
 
-  if (args[0] !== '--force' && args[0] !== '-f') {
-    if (stdout.trim() !== '') {
-      console.error('Changes not committed, abort (use --force or -f to force update metadata.json)')
-      process.exit(1)
+  const settings = {}
+  while (args.length > 0) {
+    const opt = args.shift()
+    switch (opt) {
+    case '-f':
+      settings.force = true
+      break
+    case '-n':
+      settings.name = args.shift()
+      break
     }
   }
-
-  const meta = await genMeta()
-  const data = JSON.stringify(meta, null, 2)
-  await writeFile('./metadata.json', data)
+  if (stdout.trim() !== '' && !settings.force) {
+    console.error('Changes not committed, abort (use -f to force update metadata.json)')
+    process.exit(1)
+  }
+  console.log(settings)
+  const meta = await genMeta(settings.name)
   console.log(meta)
 }
 
-async function genMeta () {
+async function genMeta (name) {
   let output
   try {
-    const data = await readFile('./metadata.json')
+    const data = await readFile(name)
     output = JSON.parse(data)
   } catch (err) {
     output = { docker_build: buildId(), build: 0 }
@@ -42,7 +49,11 @@ async function genMeta () {
 
   const { stdout: branch } = await execP('git branch --show-current')
   output.branch = branch.trim()
-  return output
+
+  const data = JSON.stringify(output, null, 2)
+  await writeFile(name, data)
+
+  return data
 }
 
 function buildId () {
